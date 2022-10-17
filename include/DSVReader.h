@@ -11,11 +11,19 @@ class CDSVReader{
         std::unique_ptr<SImplementation> DImplementation;
 
     public:
-        CDSVReader(std::shared_ptr< CDataSource > src, char delimiter);
-        ~CDSVReader();
+        CDSVReader(std::shared_ptr< CDataSource > src, char delimiter);  //Constructor for DSV reader, src specifies the data source and delimiter specifies the delimiting character
+        ~CDSVReader();   // Destructor for DSV reader
 
-        bool End() const;
-        bool ReadRow(std::vector<std::string> &row);
+        bool End() const;   //Returns true if all rows have been read from the DSV
+        bool ReadRow(std::vector<std::string> &row);   //Returns true if the row is successfully read, one string will be put in the row per column
 };
+
+
+'''''
+Values that have either the delimiter, double quote character, or newline must be quoted 
+with double quotes.  
+Double quote character in the cell must be replace with two double quotes. 
+An empty line is a valid row where there are not values 
+'''''
 
 #endif
