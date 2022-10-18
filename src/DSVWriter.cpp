@@ -39,9 +39,12 @@ bool CDSVWriter::WriteRow(const std::vector<std::string> &row)  // Returns true 
 
 std::vector<std::string> temp = row;
 int count = 0;
+
+
+
 for (int i = 0; i < temp.size(); i++)
 {
-     if (CDSVWriter::DImplementation->flag == true)  //FIX if quoteall is true, add double quotes to start and end of every elem
+     if (CDSVWriter::DImplementation->flag == true) 
     {
         CDSVWriter::DImplementation->sink->Put('\"');
     }
@@ -60,7 +63,7 @@ for (int i = 0; i < temp.size(); i++)
         CDSVWriter::DImplementation->sink->Put(temp[i][j]);
     }
  
-    if (CDSVWriter::DImplementation->flag == true)  //FIX if quoteall is true, add double quotes to start and end of every elem
+    if (CDSVWriter::DImplementation->flag == true)  
     {
         CDSVWriter::DImplementation->sink->Put('\"');
     }

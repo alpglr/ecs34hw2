@@ -83,6 +83,11 @@ TEST(DSVWriter, WriteTest){
     EXPECT_EQ(Sink9->String(), ",line,,,empty,\",\"");
 
 
+/*     auto Sink10 = std::make_shared<CStringDataSink[10]>();
+    CDSVWriter Writer10(Sink10, ',');  
+    input = {"this", "is", "more", "longer", "than", "allocated"};
+    EXPECT_FALSE(Writer10.WriteRow(input)); */
+
     //sink with a finite size, and it would overflow to do the put or write.
 
 /*
@@ -94,7 +99,7 @@ An empty line is a valid row where there are not values
 }
 
 
-/*  TEST(DSVReader, ReadTest){
+TEST(DSVReader, ReadTest){
       auto Source = std::make_shared<CStringDataSource>("Hello&World!");
       CDSVReader Reader (Source, '&');
       std::vector<std::string> output;
@@ -105,4 +110,4 @@ An empty line is a valid row where there are not values
       EXPECT_EQ(output[0], "Hello");
       EXPECT_EQ(output[1], "World!");
 
- } */
+ } 
