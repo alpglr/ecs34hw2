@@ -4,8 +4,8 @@
 
 TEST(XMLReader, CharacterDataTest) {
 	CStringDataSource Source1("<test>This is a test!</test>");
-	std::shared_ptr<CDataSource> PSource1 = std::make_shared<CDataSource>(Source1);
-	CXMLReader Reader1(Source1);
+	std::shared_ptr<CStringDataSource> PSource1 = std::make_shared<CStringDataSource>(Source1);
+	CXMLReader Reader1(PSource1);
 	
 	SXMLEntity NextEntity;
 	Reader1.ReadEntity(NextEntity);

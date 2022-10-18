@@ -31,7 +31,7 @@ struct CXMLReader::SImplementation {
         for (int i = 0; i < len; ++i) {
             NewEntity.DNameData += s[i];
         }
-        NewEntity.DType = SMXLEntity::EType::CharData;
+        NewEntity.DType = SXMLEntity::EType::CharData;
         DEntities.push_back(NewEntity);
     };
 
@@ -63,7 +63,7 @@ struct CXMLReader::SImplementation {
     }
 
     bool End() const {
-
+        return DEntities.empty();
     };
 
     bool ReadEntity(SXMLEntity& entity, bool skipcdata) {
@@ -91,7 +91,12 @@ struct CXMLReader::SImplementation {
                     return true;
                 }
             }
+            if (End() && Buffer.empty()) {
+                Done = true;
+            }
         }
+
+        return false;
     };
 };
 
