@@ -8,7 +8,7 @@ BIN_DIR=./bin
 OBJ_DIR=./obj
 
 CXXFLAG=-std=c++17 -I $(INC_DIR) -I /opt/local/include
-LDFLAGS=-L /opt/local/lib -lgtest -lgtest_main -lpthread
+LDFLAGS=-L /opt/local/lib -lgtest -lgtest_main -lpthread -lexpat
 
 all: directories runstrtest rundatasourcetest rundatasinktest rundsvtest runxmltest
 
