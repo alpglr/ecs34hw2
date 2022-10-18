@@ -81,6 +81,9 @@ struct CXMLReader::SImplementation {
                         DEntities.pop_front();
                         return true;
                     }
+                    else {
+                        DEntities.pop_front();
+                    }
                 }
                 else {
                     entity = DEntities.front();
