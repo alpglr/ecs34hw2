@@ -19,4 +19,11 @@ class CDSVReader{
 };
 
 
+'''''
+Values that have either the delimiter, double quote character, or newline must be quoted 
+with double quotes.  
+Double quote character in the cell must be replace with two double quotes. 
+An empty line is a valid row where there are not values 
+'''''
+
 #endif
