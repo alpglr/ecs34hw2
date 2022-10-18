@@ -33,12 +33,12 @@ $(BIN_DIR)/teststrdatasink: $(OBJ_DIR)/StringDataSinkTest.o $(OBJ_DIR)/StringDat
 	$(CXX) -o $(BIN_DIR)/teststrdatasink $(OBJ_DIR)/StringDataSinkTest.o $(OBJ_DIR)/StringDataSink.o $(LDFLAGS)
 
 
-$(BIN_DIR)/testdsv: $(OBJ_DIR)/DSVTest.o $(OBJ_DIR)/DSVWriter.o $(OBJ_DIR)/DSVReader.o					#test						
-	$(CXX) -o $(BIN_DIR)/testdsv $(OBJ_DIR)/DSVWriter.o $(OBJ_DIR)/DSVReader.o $(LDFLAGS) 
+$(BIN_DIR)/testdsv: $(OBJ_DIR)/DSVTest.o $(OBJ_DIR)/DSVWriter.o $(OBJ_DIR)/DSVReader.o $(OBJ_DIR)/StringDataSink.o $(OBJ_DIR)/StringDataSource.o $(OBJ_DIR)/StringUtils.o			#test						
+	$(CXX) -o $(BIN_DIR)/testdsv $(OBJ_DIR)/DSVTest.o $(OBJ_DIR)/DSVWriter.o $(OBJ_DIR)/DSVReader.o $(LDFLAGS) $(OBJ_DIR)/StringDataSink.o $(OBJ_DIR)/StringDataSource.o $(OBJ_DIR)/StringUtils.o
 
 
-$(BIN_DIR)/testxml: $(OBJ_DIR)/XMLTest.o $(OBJ_DIR)/XMLWriter.o $(OBJ_DIR)/XMLReader.o					#test						
-	$(CXX) -o $(BIN_DIR)/testxml $(OBJ_DIR)/XMLWriter.o $(OBJ_DIR)/XMLReader.o $(LDFLAGS)
+$(BIN_DIR)/testxml: $(OBJ_DIR)/XMLTest.o $(OBJ_DIR)/XMLWriter.o $(OBJ_DIR)/XMLReader.o $(OBJ_DIR)/StringDataSink.o $(OBJ_DIR)/StringDataSource.o $(OBJ_DIR)/StringUtils.o					#test						
+	$(CXX) -o $(BIN_DIR)/testxml $(OBJ_DIR)/XMLTest.o $(OBJ_DIR)/XMLWriter.o $(OBJ_DIR)/XMLReader.o $(LDFLAGS) $(OBJ_DIR)/StringDataSink.o $(OBJ_DIR)/StringDataSource.o $(OBJ_DIR)/StringUtils.o
 
 
 
@@ -66,10 +66,11 @@ $(OBJ_DIR)/StringDataSink.o: $(SRC_DIR)/StringDataSink.cpp $(INC_DIR)/StringData
 
 
 
-$(OBJ_DIR)/DSVTest.o: $(TESTSRC_DIR)/DSVTest.cpp $(INC_DIR)/DSVWriter.h $(INC_DIR)/DSVReader.h $(INC_DIR)/DataSink.h $(INC_DIR)/DataSource.h
+$(OBJ_DIR)/DSVTest.o: $(TESTSRC_DIR)/DSVTest.cpp $(INC_DIR)/DSVWriter.h $(INC_DIR)/DSVReader.h $(INC_DIR)/DataSink.h $(INC_DIR)/DataSource.h $(INC_DIR)/StringUtils.h
 	$(CXX) -o $(OBJ_DIR)/DSVTest.o $(CXXFLAG) -c $(TESTSRC_DIR)/DSVTest.cpp
 
-$(OBJ_DIR)/DSVWriter.o: $(SRC_DIR)/DSVWriter.cpp $(INC_DIR)/DSVWriter.h $(INC_DIR)/DataSink.h
+$(OBJ_DIR)/DSVWriter.o: $(SRC_DIR)/DSVWriter.cpp $(INC_DIR)/DSVWriter.h $(INC_DIR)/DataSink.h $(INC_DIR)/StringUtils.h $(INC_DIR)/StringDataSink.h
+
 	$(CXX) -o $(OBJ_DIR)/DSVWriter.o $(CXXFLAG) -c $(SRC_DIR)/DSVWriter.cpp
 
 $(OBJ_DIR)/DSVReader.o: $(SRC_DIR)/DSVReader.cpp $(INC_DIR)/DSVReader.h $(INC_DIR)/DataSource.h
