@@ -46,11 +46,15 @@ for (int i = 0; i < temp.size(); i++)
 {
      if (CDSVWriter::DImplementation->flag == true) 
     {
-        CDSVWriter::DImplementation->sink->Put('\"');
+        if(!CDSVWriter::DImplementation->sink->Put('\"')) 
+        return false;
     }
 
     if ( (CDSVWriter::DImplementation->flag == false) && ( (row[i].find(CDSVWriter::DImplementation->delim) != std::string::npos) || (temp[i].find('\"') != std::string::npos) || (temp[i].find('\n') != std::string::npos) ) ) //if delimeter, double quote, or newline is in the string, add double quotes
-    CDSVWriter::DImplementation->sink->Put('\"'); 
+    {
+        if(!CDSVWriter::DImplementation->sink->Put('\"')) 
+        return false; 
+    }
     
     if (temp[i].find('\"') != std::string::npos)   //Double quote character in the cell must be replaced with two double quotes. 
 
@@ -60,22 +64,28 @@ for (int i = 0; i < temp.size(); i++)
 
     for (int j = 0; j < temp[i].length(); j++)
     {
-        CDSVWriter::DImplementation->sink->Put(temp[i][j]);
+        if(!CDSVWriter::DImplementation->sink->Put(temp[i][j])) 
+        return false;
     }
  
     if (CDSVWriter::DImplementation->flag == true)  
     {
-        CDSVWriter::DImplementation->sink->Put('\"');
+        if(!CDSVWriter::DImplementation->sink->Put('\"'))
+        return false;
     }
 
     if ( (CDSVWriter::DImplementation->flag == false) && ( (temp[i].find(CDSVWriter::DImplementation->delim) != std::string::npos) || (temp[i].find('\"') != std::string::npos) || (temp[i].find('\n') != std::string::npos) ) ) //if delimeter, double quote, or newline is in the string, add double quotes
-        CDSVWriter::DImplementation->sink->Put('\"');
+    {
+        if(!CDSVWriter::DImplementation->sink->Put('\"'))
+        return false; 
+    }
 
     count = count+1;
 
     if (count < temp.size())
     {
-    CDSVWriter::DImplementation->sink->Put(DImplementation->delim);   //to separate the strings
+    if(!CDSVWriter::DImplementation->sink->Put(DImplementation->delim))   //to separate the elems
+    return false;
     }  
 }
 //check the string. if it is successfully written, return true

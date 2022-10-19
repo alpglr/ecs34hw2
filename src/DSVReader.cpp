@@ -47,7 +47,8 @@ bool CDSVReader::ReadRow(std::vector<std::string> &row)   //Returns true if the 
     while(true)                  //iterate through every character in the source string
     {
     char tmp;
-    CDSVReader::DImplementation->source->Get(tmp);
+    if (!CDSVReader::DImplementation->source->Get(tmp))
+    return false;
 
     if (tmp != CDSVReader::DImplementation->delim)  //if not delimeter, add to row elem
     {
