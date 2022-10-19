@@ -16,7 +16,6 @@ struct CXMLWriter::SImplementation {
 	bool Flush() {
 		while (!DEntities.empty()) {
 			WriteEntity(DEntities.top());
-			DEntities.pop();
 		}
 
 		return true;
@@ -68,7 +67,7 @@ struct CXMLWriter::SImplementation {
 				DSink->Write(std::vector<char>(std::get<1>(Attribute).begin(), std::get<1>(Attribute).end()));
 				DSink->Put('\"');
 			}
-			DSink->Put('\\');
+			DSink->Put('/');
 			DSink->Put('>');
 			break;
 		}
