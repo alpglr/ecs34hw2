@@ -28,7 +28,7 @@ CDSVReader::~CDSVReader()   // Destructor for DSV reader
 
 bool CDSVReader::End() const  //Returns true if all rows have been read from the DSV
 {
-    return true;  //implement
+    return CDSVReader::DImplementation->source->End();
 
 }
 

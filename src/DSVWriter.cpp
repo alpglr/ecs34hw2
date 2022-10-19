@@ -27,7 +27,7 @@ CDSVWriter::CDSVWriter(std::shared_ptr< CDataSink > sink, char delimiter, bool q
 
 CDSVWriter::~CDSVWriter()   //Destructor for DSV writer
 {
-//leave empty?
+    
 }
 
 bool CDSVWriter::WriteRow(const std::vector<std::string> &row)  // Returns true if the row is successfully written, one string per column should be put in the row vector
