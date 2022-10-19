@@ -1,6 +1,5 @@
 #include "XMLWriter.h"
 #include <stack>
-#include <iostream>
 
 struct CXMLWriter::SImplementation {
 	std::shared_ptr<CDataSink> DSink;
@@ -26,7 +25,6 @@ struct CXMLWriter::SImplementation {
 	bool WriteEntity(const SXMLEntity& entity) {
 		switch (entity.DType) {
 		case (SXMLEntity::EType::StartElement): {
-			std::cout << "Hello";
 			DSink->Put('<');
 			DSink->Write(std::vector<char>(entity.DNameData.begin(), entity.DNameData.end()));
 			for (auto& Attribute : entity.DAttributes) {
@@ -47,7 +45,7 @@ struct CXMLWriter::SImplementation {
 		case (SXMLEntity::EType::EndElement):
 			if (DEntities.top().DNameData == entity.DNameData) {
 				DSink->Put('<');
-				DSink->Put('\\');
+				DSink->Put('/');
 				DSink->Write(std::vector<char>(entity.DNameData.begin(), entity.DNameData.end()));
 				DSink->Put('>');
 				DEntities.pop();

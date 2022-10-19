@@ -22,11 +22,19 @@ TEST(XMLReader, CharacterDataTest) {
 }
 
 TEST(XMLWriter, WriteEntityTest) {
-	CStringDataSink Sink1;
-	std::shared_ptr<CStringDataSink> PSink1 = std::make_shared<CStringDataSink>(Sink1);
-	CXMLWriter Writer1(PSink1);
-
-	SXMLEntity Entity1 = {.DType = SXMLEntity::EType::StartElement, .DNameData = "test"};
+	std::shared_ptr<CStringDataSink> Sink1 = std::make_shared<CStringDataSink>();
+	CXMLWriter Writer1(Sink1);
+	SXMLEntity Entity1 = {SXMLEntity::EType::StartElement, "test"};
 	Writer1.WriteEntity(Entity1);
-	EXPECT_EQ(Sink1.String(), "<test>");
+	EXPECT_EQ(Sink1->String(), "<test>");
+	Entity1.DType = SXMLEntity::EType::EndElement;
+	Writer1.WriteEntity(Entity1);
+	EXPECT_EQ(Sink1->String(), "<test></test>");
+	
+	std::shared_ptr<CStringDataSink> Sink2 = std::make_shared<CStringDataSink>();
+	CXMLWriter Writer2(Sink2);
+	SXMLEntity Entity2 = { SXMLEntity::EType::StartElement, "test2" };
+	Entity2.SetAttribute("is_test", "true");
+	Writer2.WriteEntity(Entity2);
+	EXPECT_EQ(Sink2->String(), "<test2 is_test=\"true\">");
 }
