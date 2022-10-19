@@ -63,7 +63,7 @@ struct CXMLReader::SImplementation {
     }
 
     bool End() const {
-        return DEntities.empty();
+        return DSource->End();
     };
 
     bool ReadEntity(SXMLEntity& entity, bool skipcdata) {
