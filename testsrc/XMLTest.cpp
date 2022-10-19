@@ -108,19 +108,41 @@ TEST(XMLReader, EndTest) {
 	Reader2.ReadEntity(NextEntity);
 	EXPECT_TRUE(Reader2.End());
 	EXPECT_FALSE(Reader2.ReadEntity(NextEntity));
+
+	CStringDataSource Source3("</end>Not read...");
+	std::shared_ptr<CStringDataSource> PSource3 = std::make_shared<CStringDataSource>(Source3);
+	CXMLReader Reader3(PSource3);
+
+	EXPECT_FALSE(Reader3.End());
+	EXPECT_FALSE(Reader3.ReadEntity(NextEntity));
+	EXPECT_TRUE(Reader3.End());
+
+	CStringDataSource Source4("<start>This is a newline \n<middle attr=yes/></start>Not read...");
+	std::shared_ptr<CStringDataSource> PSource4 = std::make_shared<CStringDataSource>(Source4);
+	CXMLReader Reader4(PSource4);
+
+	EXPECT_FALSE(Reader4.End());
+	Reader4.ReadEntity(NextEntity);
+	Reader4.ReadEntity(NextEntity, true);
+	EXPECT_FALSE(Reader4.ReadEntity(NextEntity));
+	EXPECT_TRUE(Reader4.End());
 }
 
 TEST(XMLWriter, WriteEntityTest) {
 	std::shared_ptr<CStringDataSink> Sink1 = std::make_shared<CStringDataSink>();
 	CXMLWriter Writer1(Sink1);
 
-	SXMLEntity Entity1 = { SXMLEntity::EType::StartElement, "test" };
+	SXMLEntity Entity1 = { SXMLEntity::EType::EndElement, "test" };
+	EXPECT_FALSE(Writer1.WriteEntity(Entity1));
+	Entity1.DType = SXMLEntity::EType::StartElement;
 	Writer1.WriteEntity(Entity1);
 	EXPECT_EQ(Sink1->String(), "<test>");
 	SXMLEntity Text1 = { SXMLEntity::EType::CharData, "test string" };
 	Writer1.WriteEntity(Text1);
 	EXPECT_EQ(Sink1->String(), "<test>"
 		"test string");
+	SXMLEntity Entity2 = { SXMLEntity::EType::EndElement, "test2" };
+	EXPECT_FALSE(Writer1.WriteEntity(Entity2));
 	SXMLEntity Complete1 = { SXMLEntity::EType::CompleteElement, "complete" };
 	Complete1.SetAttribute("warriors", "good");
 	Complete1.SetAttribute("lakers", "bad");

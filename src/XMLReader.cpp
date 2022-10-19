@@ -6,7 +6,7 @@ struct CXMLReader::SImplementation {
     std::shared_ptr< CDataSource > DSource;
     XML_Parser DParser;
     std::deque<SXMLEntity> DEntities;
-    XML_Status errorval = XML_STATUS_OK;
+    XML_Status error_val = XML_STATUS_OK;
 
     void StartElement(const XML_Char* name, const XML_Char** atts) {
         SXMLEntity NewEntity;
@@ -64,7 +64,7 @@ struct CXMLReader::SImplementation {
     }
 
     bool End() const {
-        return ((DSource->End() || (errorval == XML_STATUS_ERROR)) && DEntities.empty());
+        return ((DSource->End() || (error_val == XML_STATUS_ERROR)) && DEntities.empty());
     };
 
     bool ReadEntity(SXMLEntity& entity, bool skipcdata) {
@@ -73,7 +73,7 @@ struct CXMLReader::SImplementation {
         while (!Done) {
             std::vector<char> Buffer;
             if (DSource->Read(Buffer, 128)) {
-                errorval = XML_Parse(DParser, Buffer.data(), Buffer.size(), DSource->End());
+                error_val = XML_Parse(DParser, Buffer.data(), Buffer.size(), DSource->End());
             }
             if (!DEntities.empty()) {
                 if (skipcdata) {

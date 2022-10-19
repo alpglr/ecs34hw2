@@ -42,6 +42,9 @@ struct CXMLWriter::SImplementation {
 			break;
 		}
 		case (SXMLEntity::EType::EndElement):
+			if (DEntities.empty()) {
+				return false;
+			}
 			if (DEntities.top().DNameData == entity.DNameData) {
 				DSink->Put('<');
 				DSink->Put('/');
