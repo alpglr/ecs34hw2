@@ -5,6 +5,7 @@
 #include "StringDataSource.h"
 #include "DataSource.h"
 #include "StringUtils.h"
+#include <iostream>
 
 struct CDSVReader::SImplementation
 {
@@ -27,6 +28,7 @@ CDSVReader::~CDSVReader()   // Destructor for DSV reader
 
 bool CDSVReader::End() const  //Returns true if all rows have been read from the DSV
 {
+    return true;  //implement
 
 }
 
@@ -39,10 +41,50 @@ bool CDSVReader::ReadRow(std::vector<std::string> &row)   //Returns true if the 
     {
         row.clear();
     }
-       //source = pointer to "Hello,World!"
 
+    int flag = 0;
+    std::string rowelem = "";
+    while(true)                  //iterate through every character in the source string
+    {
+    char tmp;
+    CDSVReader::DImplementation->source->Get(tmp);
 
-    //row = StringUtils::Split(DImplementation->source, DImplementation->delim);   //split the source to a vector of strings splitting on the delimeter.
-    //access using methods in stringdatasource
+    if (tmp != CDSVReader::DImplementation->delim)  //if not delimeter, add to row elem
+    {
+        rowelem = rowelem + tmp;
+
+        if ( (tmp == '\"') && (!flag))   
+        {
+        flag = 1;
+        }
+
+        else if ( (tmp == '\"') && (flag))
+        {
+        flag = 0;
+        }
+
+    }
+
+    else if ((tmp == CDSVReader::DImplementation->delim) && flag) //if delim is part of string
+    {
+        rowelem = rowelem + tmp;
+
+    }
+
+    else if ((tmp == CDSVReader::DImplementation->delim) && !flag)  //if delim is not part of string
+    {
+        //if char is the delimeter and its not part of the string, don't push, end the vector element (cell). make a new string
+        row.push_back(rowelem);
+        rowelem = "";
+    }
+
+    if (CDSVReader::DImplementation->source->End())
+    {
+        row.push_back(rowelem);
+        break;
+    }
+
+    }
+    return true;
 
 }
