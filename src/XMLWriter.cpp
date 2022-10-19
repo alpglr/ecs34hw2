@@ -1,5 +1,6 @@
 #include "XMLWriter.h"
 #include <stack>
+#include <iostream>
 
 struct CXMLWriter::SImplementation {
 	std::shared_ptr<CDataSink> DSink;
@@ -14,7 +15,7 @@ struct CXMLWriter::SImplementation {
 	}
 
 	bool Flush() {
-		while (DEntities.top()) {
+		while (!DEntities.empty()) {
 			WriteEntity(DEntities.top());
 			DEntities.pop();
 		}
@@ -24,20 +25,31 @@ struct CXMLWriter::SImplementation {
 
 	bool WriteEntity(const SXMLEntity& entity) {
 		switch (entity.DType) {
-		case (SXMLEntity::EType::StartElement):
-			DSink->Write("<" + entity.DNameData);
+		case (SXMLEntity::EType::StartElement): {
+			std::cout << "Hello";
+			DSink->Put('<');
+			DSink->Write(std::vector<char>(entity.DNameData.begin(), entity.DNameData.end()));
 			for (auto& Attribute : entity.DAttributes) {
-				DSink->Write(" " + std::get<0>(Attribute) + "=\"" + std::get<1>(Attribute) + "\"");
+				DSink->Put(' ');
+				DSink->Write(std::vector<char>(std::get<0>(Attribute).begin(), std::get<0>(Attribute).end()));
+				DSink->Put('=');
+				DSink->Put('\"');
+				DSink->Write(std::vector<char>(std::get<1>(Attribute).begin(), std::get<1>(Attribute).end()));
+				DSink->Put('\"');
 			}
 			DSink->Put('>');
 
-			SXMLEntity entity_copy = { .DType = SXMLEntity::EType::EndElement, .DNameData = entity.DNameData, 
-										.DAttributes = entity.DAttributes};
+			SXMLEntity entity_copy = { .DType = SXMLEntity::EType::EndElement, .DNameData = entity.DNameData,
+										.DAttributes = entity.DAttributes };
 			DEntities.push(entity_copy);
 			break;
+		}
 		case (SXMLEntity::EType::EndElement):
 			if (DEntities.top().DNameData == entity.DNameData) {
-				DSink->Write("</" + entity.DNameData + ">");
+				DSink->Put('<');
+				DSink->Put('\\');
+				DSink->Write(std::vector<char>(entity.DNameData.begin(), entity.DNameData.end()));
+				DSink->Put('>');
 				DEntities.pop();
 				break;
 			}
@@ -45,14 +57,22 @@ struct CXMLWriter::SImplementation {
 				return false;
 			}
 		case (SXMLEntity::EType::CharData):
-			DSink->Write(entity.DNameData);
+			DSink->Write(std::vector<char>(entity.DNameData.begin(), entity.DNameData.end()));
 			break;
 		case (SXMLEntity::EType::CompleteElement):
-			DSink->Write("<" + entity.DNameData);
+			DSink->Put('<');
+			DSink->Write(std::vector<char>(entity.DNameData.begin(), entity.DNameData.end()));
 			for (auto& Attribute : entity.DAttributes) {
-				DSink->Write(" " + std::get<0>(Attribute) + "=\"" + std::get<1>(Attribute) + "\"");
+				DSink->Put(' ');
+				DSink->Write(std::vector<char>(std::get<0>(Attribute).begin(), std::get<0>(Attribute).end()));
+				DSink->Put('=');
+				DSink->Put('\"');
+				DSink->Write(std::vector<char>(std::get<1>(Attribute).begin(), std::get<1>(Attribute).end()));
+				DSink->Put('\"');
 			}
-			DSink->Write("/>");
+			DSink->Put('\\');
+			DSink->Put('>');
+			break;
 		}
 
 		return true;
@@ -67,10 +87,10 @@ CXMLWriter::~CXMLWriter() {
 
 }
 
-bool Flush() {
+bool CXMLWriter::Flush() {
 	return DImplementation->Flush();
 }
 
-bool WriteEntity(const SXMLEntity &entity) {
-	return DImplementation->WriteEntity(&entity);
+bool CXMLWriter::WriteEntity(const SXMLEntity &entity) {
+	return DImplementation->WriteEntity(entity);
 }

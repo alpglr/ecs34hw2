@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "XMLReader.h"
+#include "XMLWriter.h"
 #include "StringDataSource.h"
+#include "StringDataSink.h"
 
 TEST(XMLReader, CharacterDataTest) {
 	CStringDataSource Source1("<test>This is a test!</test>");
@@ -17,4 +19,14 @@ TEST(XMLReader, CharacterDataTest) {
 	Reader1.ReadEntity(NextEntity);
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::EndElement);
 	EXPECT_EQ(NextEntity.DNameData, "test");
+}
+
+TEST(XMLWriter, WriteEntityTest) {
+	CStringDataSink Sink1;
+	std::shared_ptr<CStringDataSink> PSink1 = std::make_shared<CStringDataSink>(Sink1);
+	CXMLWriter Writer1(PSink1);
+
+	SXMLEntity Entity1 = {.DType = SXMLEntity::EType::StartElement, .DNameData = "test"};
+	Writer1.WriteEntity(Entity1);
+	EXPECT_EQ(Sink1.String(), "<test>");
 }
