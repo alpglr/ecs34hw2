@@ -13,7 +13,7 @@ TEST(XMLReader, ReadEntityTest) {
 	CXMLReader Reader1(PSource1);
 	SXMLEntity NextEntity;
 
-	// EXPECT_FALSE(Reader1.End());
+	EXPECT_FALSE(Reader1.End());
 	Reader1.ReadEntity(NextEntity);
 	EXPECT_FALSE(Reader1.End());
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::StartElement);
@@ -34,9 +34,11 @@ TEST(XMLReader, ReadEntityTest) {
 	Reader1.ReadEntity(NextEntity);
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::EndElement);
 	EXPECT_EQ(NextEntity.DNameData, "test2");
+	EXPECT_FALSE(Reader1.End());
 	Reader1.ReadEntity(NextEntity);
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::EndElement);
 	EXPECT_EQ(NextEntity.DNameData, "test");
+	EXPECT_TRUE(Reader1.End());
 	EXPECT_FALSE(Reader1.ReadEntity(NextEntity));
 	EXPECT_TRUE(Reader1.End());
 
@@ -80,6 +82,31 @@ TEST(XMLReader, ReadEntityTest) {
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::EndElement);
 	EXPECT_EQ(NextEntity.DNameData, "begin");
 	EXPECT_FALSE(NextEntity.AttributeExists(""));
+	EXPECT_FALSE(Reader2.ReadEntity(NextEntity));
+}
+
+TEST(XMLReader, EndTest) {
+	CStringDataSource Source1("<test></test>Not read...<test2></test2>");
+	std::shared_ptr<CStringDataSource> PSource1 = std::make_shared<CStringDataSource>(Source1);
+	CXMLReader Reader1(PSource1);
+	SXMLEntity NextEntity;
+
+	EXPECT_FALSE(Reader1.End());
+	Reader1.ReadEntity(NextEntity);
+	EXPECT_FALSE(Reader1.End());
+	Reader1.ReadEntity(NextEntity);
+	EXPECT_TRUE(Reader1.End());
+	EXPECT_FALSE(Reader1.ReadEntity(NextEntity));
+
+	CStringDataSource Source2("<test1><test2></test1>Not read...</test2>");
+	std::shared_ptr<CStringDataSource> PSource2 = std::make_shared<CStringDataSource>(Source2);
+	CXMLReader Reader2(PSource2);
+
+	EXPECT_FALSE(Reader2.End());
+	Reader2.ReadEntity(NextEntity);
+	EXPECT_FALSE(Reader2.End());
+	Reader2.ReadEntity(NextEntity);
+	EXPECT_TRUE(Reader2.End());
 	EXPECT_FALSE(Reader2.ReadEntity(NextEntity));
 }
 
