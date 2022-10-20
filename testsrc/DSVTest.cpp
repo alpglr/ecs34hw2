@@ -106,7 +106,7 @@ An empty line is a valid row where there are not values
 
 
 TEST(DSVReader, ReadTest){
-      /*auto Source = std::make_shared<CStringDataSource>("Hello&World!");
+      auto Source = std::make_shared<CStringDataSource>("Hello&World!");
       CDSVReader Reader (Source, '&');
       std::vector<std::string> output;
 
@@ -114,7 +114,7 @@ TEST(DSVReader, ReadTest){
       EXPECT_TRUE(Reader.End());
       ASSERT_EQ(output.size(), 2);
       EXPECT_EQ(output[0], "Hello");
-      EXPECT_EQ(output[1], "World!");*/
+      EXPECT_EQ(output[1], "World!");
 
 
 
