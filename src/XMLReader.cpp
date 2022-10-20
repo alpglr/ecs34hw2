@@ -6,6 +6,7 @@ struct CXMLReader::SImplementation {
     std::shared_ptr< CDataSource > DSource;
     XML_Parser DParser;
     std::deque<SXMLEntity> DEntities;
+    XML_Status error_val = XML_STATUS_OK;
 
     void StartElement(const XML_Char* name, const XML_Char** atts) {
         SXMLEntity NewEntity;
@@ -31,7 +32,7 @@ struct CXMLReader::SImplementation {
         for (int i = 0; i < len; ++i) {
             NewEntity.DNameData += s[i];
         }
-        NewEntity.DType = SMXLEntity::EType::CharData;
+        NewEntity.DType = SXMLEntity::EType::CharData;
         DEntities.push_back(NewEntity);
     };
 
@@ -63,7 +64,7 @@ struct CXMLReader::SImplementation {
     }
 
     bool End() const {
-
+        return ((DSource->End() || (error_val == XML_STATUS_ERROR)) && DEntities.empty());
     };
 
     bool ReadEntity(SXMLEntity& entity, bool skipcdata) {
@@ -72,7 +73,7 @@ struct CXMLReader::SImplementation {
         while (!Done) {
             std::vector<char> Buffer;
             if (DSource->Read(Buffer, 128)) {
-                XML_Parse(DParser, Buffer.data(), Buffer.size(), DSource->End());
+                error_val = XML_Parse(DParser, Buffer.data(), Buffer.size(), DSource->End());
             }
             if (!DEntities.empty()) {
                 if (skipcdata) {
@@ -83,6 +84,7 @@ struct CXMLReader::SImplementation {
                     }
                     else {
                         DEntities.pop_front();
+                        continue;
                     }
                 }
                 else {
@@ -91,7 +93,12 @@ struct CXMLReader::SImplementation {
                     return true;
                 }
             }
+            if (End() && Buffer.empty()) {
+                Done = true;
+            }
         }
+
+        return false;
     };
 };
 

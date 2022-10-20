@@ -87,16 +87,13 @@ $(OBJ_DIR)/XMLReader.o: $(SRC_DIR)/XMLReader.cpp $(INC_DIR)/XMLReader.h $(INC_DI
 	$(CXX) -o $(OBJ_DIR)/XMLReader.o $(CXXFLAG) -c $(SRC_DIR)/XMLReader.cpp
 
 
-#add expat library??
-
-
 
 directories:
 	mkdir -p $(BIN_DIR)
 	mkdir -p $(OBJ_DIR)
 
 
-.PHONY : clean
+.PHONY : all clean
 clean :
 		-rm -rf $(BIN_DIR)
 		-rm -rf $(OBJ_DIR)
