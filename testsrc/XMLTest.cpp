@@ -14,24 +14,24 @@ TEST(XMLReader, ReadEntityTest) {
 	SXMLEntity NextEntity;
 
 	EXPECT_FALSE(Reader1.End());
-	Reader1.ReadEntity(NextEntity);
+	EXPECT_TRUE(Reader1.ReadEntity(NextEntity));
 	EXPECT_FALSE(Reader1.End());
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::StartElement);
 	EXPECT_EQ(NextEntity.DNameData, "test");
 	EXPECT_TRUE(NextEntity.AttributeExists("attr"));
 	EXPECT_EQ(NextEntity.AttributeValue("attr"), "Hello");
-	Reader1.ReadEntity(NextEntity);
+	EXPECT_TRUE(Reader1.ReadEntity(NextEntity));
 	EXPECT_FALSE(Reader1.End());
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::CharData);
 	EXPECT_EQ(NextEntity.DNameData, "This is a test!");
-	Reader1.ReadEntity(NextEntity);
+	EXPECT_TRUE(Reader1.ReadEntity(NextEntity));
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::StartElement);
 	EXPECT_EQ(NextEntity.DNameData, "test2");
 	EXPECT_TRUE(NextEntity.AttributeExists("attr"));
 	EXPECT_EQ(NextEntity.AttributeValue("attr"), "World!");
 	EXPECT_TRUE(NextEntity.AttributeExists("attr2"));
 	EXPECT_EQ(NextEntity.AttributeValue("attr2"), "!!!");
-	Reader1.ReadEntity(NextEntity);
+	EXPECT_TRUE(Reader1.ReadEntity(NextEntity));
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::EndElement);
 	EXPECT_EQ(NextEntity.DNameData, "test2");
 	EXPECT_FALSE(Reader1.End());
@@ -135,10 +135,10 @@ TEST(XMLWriter, WriteEntityTest) {
 	SXMLEntity Entity1 = { SXMLEntity::EType::EndElement, "test" };
 	EXPECT_FALSE(Writer1.WriteEntity(Entity1));
 	Entity1.DType = SXMLEntity::EType::StartElement;
-	Writer1.WriteEntity(Entity1);
+	EXPECT_TRUE(Writer1.WriteEntity(Entity1));
 	EXPECT_EQ(Sink1->String(), "<test>");
 	SXMLEntity Text1 = { SXMLEntity::EType::CharData, "test string" };
-	Writer1.WriteEntity(Text1);
+	EXPECT_TRUE(Writer1.WriteEntity(Text1));
 	EXPECT_EQ(Sink1->String(), "<test>"
 		"test string");
 	SXMLEntity Entity2 = { SXMLEntity::EType::EndElement, "test2" };
@@ -146,12 +146,12 @@ TEST(XMLWriter, WriteEntityTest) {
 	SXMLEntity Complete1 = { SXMLEntity::EType::CompleteElement, "complete" };
 	Complete1.SetAttribute("warriors", "good");
 	Complete1.SetAttribute("lakers", "bad");
-	Writer1.WriteEntity(Complete1);
+	EXPECT_TRUE(Writer1.WriteEntity(Complete1));
 	EXPECT_EQ(Sink1->String(), "<test>"
 		"test string"
 		"<complete warriors=\"good\" lakers=\"bad\"/>");
 	Entity1.DType = SXMLEntity::EType::EndElement;
-	Writer1.WriteEntity(Entity1);
+	EXPECT_TRUE(Writer1.WriteEntity(Entity1));
 	EXPECT_EQ(Sink1->String(), "<test>"
 		"test string"
 		"<complete warriors=\"good\" lakers=\"bad\"/>"
@@ -173,7 +173,14 @@ TEST(XMLWriter, FlushTest) {
 	EXPECT_EQ(Sink2->String(),	"<test2 is_test=\"true\">"
 									"<test3>"
 										"<test4>");
-	Writer2.Flush();
+	EXPECT_TRUE(Writer2.Flush());
+	EXPECT_EQ(Sink2->String(), "<test2 is_test=\"true\">"
+									"<test3>"
+										"<test4>"
+										"</test4>"
+									"</test3>"
+								"</test2>");
+	EXPECT_TRUE(Writer2.Flush());
 	EXPECT_EQ(Sink2->String(), "<test2 is_test=\"true\">"
 									"<test3>"
 										"<test4>"
