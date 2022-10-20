@@ -6,7 +6,7 @@
 #include "DataSource.h"
 #include "StringUtils.h"
 #include <iostream>
-
+#include <cctype>
 struct CDSVReader::SImplementation
 {
     std::shared_ptr< CDataSource > source;
@@ -34,6 +34,9 @@ bool CDSVReader::End() const  //Returns true if all rows have been read from the
 
 bool CDSVReader::ReadRow(std::vector<std::string> &row)   //Returns true if the row is successfully read, one string will be put in the row per column. 
 {
+
+    //if tmp (char) == \n and !flag, don't add char to string and end the row
+
     //clear whatever is in the row before you write to it.
     //read in strings from the source, separate them by delimiter, put them in the row vector. The source is a CStringDataSource while the row should be a vector of strings.
 
@@ -50,7 +53,10 @@ bool CDSVReader::ReadRow(std::vector<std::string> &row)   //Returns true if the 
     if (!CDSVReader::DImplementation->source->Get(tmp))
     return false;
 
-    if (tmp != CDSVReader::DImplementation->delim)  //if not delimeter, add to row elem
+
+
+
+    if ( (tmp != CDSVReader::DImplementation->delim) && (tmp != '\n') ) //if not delimeter or newline, add to row elem.    
     {
         rowelem = rowelem + tmp;
 
@@ -74,10 +80,24 @@ bool CDSVReader::ReadRow(std::vector<std::string> &row)   //Returns true if the 
 
     else if ((tmp == CDSVReader::DImplementation->delim) && !flag)  //if delim is not part of string
     {
-        //if char is the delimeter and its not part of the string, don't push, end the vector element (cell). make a new string
+        //if char is the delimeter and its not part of the string, don't add to string, end the vector element (cell). make a new string
         row.push_back(rowelem);
         rowelem = "";
     }
+
+    else if ((tmp == '\n') && flag) //if newline is part of string
+    {
+        rowelem = rowelem + tmp;
+
+    }
+
+    else if ((tmp == '\n') && !flag)  //if newline is not part of string-->end the row
+    {
+        //if char is the delimeter and its not part of the string, don't add to string, end the vector 
+        row.push_back(rowelem);
+        break;
+    }
+
 
     if (CDSVReader::DImplementation->source->End())
     {

@@ -11,6 +11,7 @@ struct CDSVWriter::SImplementation
     std::shared_ptr< CDataSink > sink;
     char delim;
     bool flag;
+    bool firstrow;
 };
 
 
@@ -21,6 +22,7 @@ CDSVWriter::CDSVWriter(std::shared_ptr< CDataSink > sink, char delimiter, bool q
     DImplementation->sink= sink;
     DImplementation->delim = delimiter;
     DImplementation->flag = quoteall;
+    DImplementation->firstrow = true;
 
 
 }
@@ -41,6 +43,11 @@ std::vector<std::string> temp = row;
 int count = 0;
 
 
+ if (!CDSVWriter::DImplementation->firstrow)  //if not firstrow, add newline
+{
+    if(!CDSVWriter::DImplementation->sink->Put('\n')) 
+        return false;
+}  
 
 for (int i = 0; i < temp.size(); i++)
 {
@@ -87,8 +94,11 @@ for (int i = 0; i < temp.size(); i++)
     if(!CDSVWriter::DImplementation->sink->Put(DImplementation->delim))   //to separate the elems
     return false;
     }  
+
+    
 }
 //check the string. if it is successfully written, return true
+CDSVWriter::DImplementation->firstrow = false;
 return true;
 }
 

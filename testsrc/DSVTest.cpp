@@ -82,6 +82,12 @@ TEST(DSVWriter, WriteTest){
     EXPECT_TRUE(Writer9.WriteRow(input));
     EXPECT_EQ(Sink9->String(), ",line,,,empty,\",\"");
 
+    auto Sink10 = std::make_shared<CStringDataSink>();
+    CDSVWriter Writer10(Sink10, ',', true);
+    input = {"third, row", "has \n delimiter"};
+     EXPECT_TRUE(Writer10.WriteRow(input));
+     EXPECT_EQ(Sink10->String(),"\"third, row\",\"has \n delimiter\"");
+
 
 /*     auto Sink10 = std::make_shared<CStringDataSink[10]>();
     CDSVWriter Writer10(Sink10, ',');  
@@ -306,5 +312,187 @@ TEST(DSVReader, ReadTest){
       EXPECT_EQ(output[4], "empty"); 
       EXPECT_EQ(output[5], "\",\""); 
 
+
+ }
+
+
+ TEST(DSVWriter, WriteTest2)
+ {
+
+    auto Sink = std::make_shared<CStringDataSink>();
+    CDSVWriter Writer(Sink,'&');  //quoteall = false
+    std::vector<std::string> input = {"Hello", "World!"};
+
+    EXPECT_TRUE(Writer.WriteRow(input));
+    EXPECT_EQ(Sink->String(),"Hello&World!");  //no values quoted
+
+    //writing second row
+
+    input = {"this", "is", "the second row"};
+    EXPECT_TRUE(Writer.WriteRow(input));
+    EXPECT_EQ(Sink->String(),"Hello&World!\nthis&is&the second row");
+
+
+    //writing third row
+
+    input = {"welcome", "to", "row 3"};
+    EXPECT_TRUE(Writer.WriteRow(input));
+    EXPECT_EQ(Sink->String(),"Hello&World!\nthis&is&the second row\nwelcome&to&row 3");
+
+ }
+
+ TEST(DSVReader, ReadTest2)
+ {
+
+      auto Source = std::make_shared<CStringDataSource>("Hello, World!\nMy Name,Bob\n this, is \"the\n third\", row\n ");
+      CDSVReader Reader (Source, ',');
+      std::vector<std::string> output1;
+      std::vector<std::string> output2;
+      std::vector<std::string> output3;
+      std::vector<std::string> output4;
+
+
+      EXPECT_TRUE(Reader.ReadRow(output1));
+      EXPECT_FALSE(Reader.End());
+      ASSERT_EQ(output1.size(), 2);
+      EXPECT_EQ(output1[0], "Hello");
+      EXPECT_EQ(output1[1], " World!");
+
+      EXPECT_TRUE(Reader.ReadRow(output2));
+      EXPECT_FALSE(Reader.End());
+      ASSERT_EQ(output2.size(), 2);
+      EXPECT_EQ(output2[0], "My Name");
+      EXPECT_EQ(output2[1], "Bob");
+
+      EXPECT_TRUE(Reader.ReadRow(output3));
+      EXPECT_FALSE(Reader.End());
+      ASSERT_EQ(output3.size(), 3);
+      EXPECT_EQ(output3[0], " this");
+      EXPECT_EQ(output3[1], " is \"the\n third\"");
+      EXPECT_EQ(output3[2], " row");
+
+
+      EXPECT_TRUE(Reader.ReadRow(output4));
+      EXPECT_TRUE(Reader.End());
+      ASSERT_EQ(output4.size(), 1);
+      EXPECT_EQ(output4[0], " ");
+
+
+
+
+
+      auto Source1 = std::make_shared<CStringDataSource>("Hello, World!\nMy Name,Bob\n this, is \"the\n third\"\n\n row\n ");  //empty row
+      CDSVReader Reader1 (Source1, ',');
+      std::vector<std::string> Output1;
+      std::vector<std::string> Output2;
+      std::vector<std::string> Output3;
+      std::vector<std::string> Output4;
+      std::vector<std::string> Output5;
+      std::vector<std::string> Output6;
+
+
+      EXPECT_TRUE(Reader1.ReadRow(Output1));
+      EXPECT_FALSE(Reader1.End());
+      ASSERT_EQ(Output1.size(), 2);
+      EXPECT_EQ(Output1[0], "Hello");
+      EXPECT_EQ(Output1[1], " World!");
+
+      EXPECT_TRUE(Reader1.ReadRow(Output2));
+      EXPECT_FALSE(Reader1.End());
+      ASSERT_EQ(Output2.size(), 2);
+      EXPECT_EQ(Output2[0], "My Name");
+      EXPECT_EQ(Output2[1], "Bob");
+
+      EXPECT_TRUE(Reader1.ReadRow(Output3));
+      EXPECT_FALSE(Reader1.End());
+      ASSERT_EQ(Output3.size(), 2);
+      EXPECT_EQ(Output3[0], " this");
+      EXPECT_EQ(Output3[1], " is \"the\n third\"");
+
+      EXPECT_TRUE(Reader1.ReadRow(Output4));
+      EXPECT_FALSE(Reader1.End());
+      ASSERT_EQ(Output4.size(), 1);
+      EXPECT_EQ(Output4[0], "");
+
+      EXPECT_TRUE(Reader1.ReadRow(Output5));
+      EXPECT_FALSE(Reader1.End());
+      ASSERT_EQ(Output5.size(), 1);
+      EXPECT_EQ(Output5[0], " row");
+
+      EXPECT_TRUE(Reader1.ReadRow(Output6));
+      EXPECT_TRUE(Reader1.End());
+      ASSERT_EQ(Output6.size(), 1);
+      EXPECT_EQ(Output6[0], " ");
+
+  /*
+  single source that has newline characters in it that separate rows. 
+  Ex. source would look like ("Hello, World!\nMy Name,Bob") with "," as delimiter. 
+  In this example in order to reach the end of the source you would have to call readrow twice. 
+  The first call would read in  {"Hello", " World!"} 
+  the second call would read in {"My Name", "Bob"}.
+  */
+ }
+
+
+
+ TEST(DSVReader, WriteReadTest2)
+ {
+    std::vector<std::string> output;
+
+
+    auto Sink7 = std::make_shared<CStringDataSink>();
+    CDSVWriter Writer7(Sink7, ',', true);   //all values quoted
+    std::vector<std::string> input = {"This", "is", "a \"nother\" example", "string"};
+    EXPECT_TRUE(Writer7.WriteRow(input));
+    EXPECT_EQ(Sink7->String(), "\"This\",\"is\",\"a \"\"nother\"\" example\",\"string\""); 
+
+    //writing second row
+
+    input = {"this", "is", "the second row"};
+    EXPECT_TRUE(Writer7.WriteRow(input));
+    EXPECT_EQ(Sink7->String(),"\"This\",\"is\",\"a \"\"nother\"\" example\",\"string\"\n\"this\",\"is\",\"the second row\"");
+
+    //writing third row
+
+     input = {"third, row", "has \n delimiter"};
+     EXPECT_TRUE(Writer7.WriteRow(input));
+     EXPECT_EQ(Sink7->String(),"\"This\",\"is\",\"a \"\"nother\"\" example\",\"string\"\n\"this\",\"is\",\"the second row\"\n\"third, row\",\"has \n delimiter\"");
+
+     //read all 3 rows
+
+     auto Source = std::make_shared<CStringDataSource>(Sink7->String());
+     CDSVReader Reader (Source, ',');
+     std::vector<std::string> output1;
+    std::vector<std::string> output2;
+    std::vector<std::string> output3;
+
+    //reading first row
+
+    EXPECT_TRUE(Reader.ReadRow(output1));
+    EXPECT_FALSE(Reader.End());
+    ASSERT_EQ(output1.size(), 4);
+    EXPECT_EQ(output1[0], "\"This\"");
+    EXPECT_EQ(output1[1], "\"is\"");
+    EXPECT_EQ(output1[2], "\"a \"\"nother\"\" example\"");   //when there is two double quotes, SHOULD read only return 1????
+    EXPECT_EQ(output1[3], "\"string\"");
+
+
+    //reading second row
+
+    EXPECT_TRUE(Reader.ReadRow(output2));
+    EXPECT_FALSE(Reader.End());
+    ASSERT_EQ(output2.size(), 3);
+    EXPECT_EQ(output2[0], "\"this\"");
+    EXPECT_EQ(output2[1], "\"is\"");
+    EXPECT_EQ(output2[2], "\"the second row\"");   
+
+    //reading third row
+
+
+    EXPECT_TRUE(Reader.ReadRow(output3));
+    EXPECT_TRUE(Reader.End());
+    ASSERT_EQ(output3.size(), 2);
+    EXPECT_EQ(output3[0], "\"third, row\"");
+    EXPECT_EQ(output3[1], "\"has \n delimiter\"");
 
  }
