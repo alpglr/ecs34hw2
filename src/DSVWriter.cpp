@@ -11,6 +11,7 @@ struct CDSVWriter::SImplementation
     std::shared_ptr< CDataSink > sink;
     char delim;
     bool flag;
+    bool firstrow;
 };
 
 
@@ -21,13 +22,14 @@ CDSVWriter::CDSVWriter(std::shared_ptr< CDataSink > sink, char delimiter, bool q
     DImplementation->sink= sink;
     DImplementation->delim = delimiter;
     DImplementation->flag = quoteall;
+    DImplementation->firstrow = true;
 
 
 }
 
 CDSVWriter::~CDSVWriter()   //Destructor for DSV writer
 {
-//leave empty?
+    
 }
 
 bool CDSVWriter::WriteRow(const std::vector<std::string> &row)  // Returns true if the row is successfully written, one string per column should be put in the row vector
@@ -41,16 +43,25 @@ std::vector<std::string> temp = row;
 int count = 0;
 
 
+ if (!CDSVWriter::DImplementation->firstrow)  //if not firstrow, add newline
+{
+    if(!CDSVWriter::DImplementation->sink->Put('\n')) 
+        return false;
+}  
 
 for (int i = 0; i < temp.size(); i++)
 {
      if (CDSVWriter::DImplementation->flag == true) 
     {
-        CDSVWriter::DImplementation->sink->Put('\"');
+        if(!CDSVWriter::DImplementation->sink->Put('\"')) 
+        return false;
     }
 
     if ( (CDSVWriter::DImplementation->flag == false) && ( (row[i].find(CDSVWriter::DImplementation->delim) != std::string::npos) || (temp[i].find('\"') != std::string::npos) || (temp[i].find('\n') != std::string::npos) ) ) //if delimeter, double quote, or newline is in the string, add double quotes
-    CDSVWriter::DImplementation->sink->Put('\"'); 
+    {
+        if(!CDSVWriter::DImplementation->sink->Put('\"')) 
+        return false; 
+    }
     
     if (temp[i].find('\"') != std::string::npos)   //Double quote character in the cell must be replaced with two double quotes. 
 
@@ -60,25 +71,34 @@ for (int i = 0; i < temp.size(); i++)
 
     for (int j = 0; j < temp[i].length(); j++)
     {
-        CDSVWriter::DImplementation->sink->Put(temp[i][j]);
+        if(!CDSVWriter::DImplementation->sink->Put(temp[i][j])) 
+        return false;
     }
  
     if (CDSVWriter::DImplementation->flag == true)  
     {
-        CDSVWriter::DImplementation->sink->Put('\"');
+        if(!CDSVWriter::DImplementation->sink->Put('\"'))
+        return false;
     }
 
     if ( (CDSVWriter::DImplementation->flag == false) && ( (temp[i].find(CDSVWriter::DImplementation->delim) != std::string::npos) || (temp[i].find('\"') != std::string::npos) || (temp[i].find('\n') != std::string::npos) ) ) //if delimeter, double quote, or newline is in the string, add double quotes
-        CDSVWriter::DImplementation->sink->Put('\"');
+    {
+        if(!CDSVWriter::DImplementation->sink->Put('\"'))
+        return false; 
+    }
 
     count = count+1;
 
     if (count < temp.size())
     {
-    CDSVWriter::DImplementation->sink->Put(DImplementation->delim);   //to separate the strings
+    if(!CDSVWriter::DImplementation->sink->Put(DImplementation->delim))   //to separate the elems
+    return false;
     }  
+
+    
 }
 //check the string. if it is successfully written, return true
+CDSVWriter::DImplementation->firstrow = false;
 return true;
 }
 
