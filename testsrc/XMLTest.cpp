@@ -14,24 +14,24 @@ TEST(XMLReader, ReadEntityTest) {
 	SXMLEntity NextEntity;
 
 	EXPECT_FALSE(Reader1.End());
-	Reader1.ReadEntity(NextEntity);
+	EXPECT_TRUE(Reader1.ReadEntity(NextEntity));
 	EXPECT_FALSE(Reader1.End());
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::StartElement);
 	EXPECT_EQ(NextEntity.DNameData, "test");
 	EXPECT_TRUE(NextEntity.AttributeExists("attr"));
 	EXPECT_EQ(NextEntity.AttributeValue("attr"), "Hello");
-	Reader1.ReadEntity(NextEntity);
+	EXPECT_TRUE(Reader1.ReadEntity(NextEntity));
 	EXPECT_FALSE(Reader1.End());
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::CharData);
 	EXPECT_EQ(NextEntity.DNameData, "This is a test!");
-	Reader1.ReadEntity(NextEntity);
+	EXPECT_TRUE(Reader1.ReadEntity(NextEntity));
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::StartElement);
 	EXPECT_EQ(NextEntity.DNameData, "test2");
 	EXPECT_TRUE(NextEntity.AttributeExists("attr"));
 	EXPECT_EQ(NextEntity.AttributeValue("attr"), "World!");
 	EXPECT_TRUE(NextEntity.AttributeExists("attr2"));
 	EXPECT_EQ(NextEntity.AttributeValue("attr2"), "!!!");
-	Reader1.ReadEntity(NextEntity);
+	EXPECT_TRUE(Reader1.ReadEntity(NextEntity));
 	EXPECT_EQ(NextEntity.DType, SXMLEntity::EType::EndElement);
 	EXPECT_EQ(NextEntity.DNameData, "test2");
 	EXPECT_FALSE(Reader1.End());
